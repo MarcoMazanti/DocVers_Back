@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class Documentacao {
     private UUID id;
     private Long idDocInfo;
+    private int versao;
     private String nomeArquivo;
     private TipoDocumento tipo;
     private String extensao;
