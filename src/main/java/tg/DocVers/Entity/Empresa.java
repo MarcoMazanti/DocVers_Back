@@ -13,7 +13,7 @@ public class Empresa {
     private Long id;
     private String nome;
     private String cnpj; // Campo único para identificar a empresa
-    private String senha;
+    private String senha; // senha salva em hash
     private String token; // token gerado de forma aleatória e armazenado em hash, o token puro deve ter no mínimo 45 caracteres
     private String tokenPrefix; // prefixo determinado pela empresa
     private SituacaoEmpresa situacao;
