@@ -32,7 +32,7 @@ public class EmpresaService {
         return new EmpresaDTO(empresaOptional.get());
     }
 
-    public EmpresaDTO resetSenha(int id, String token, ResetSenhaDTO resetSenhaDTO) {
+    public EmpresaDTO resetSenha(Long id, String token, ResetSenhaDTO resetSenhaDTO) {
         Optional<Empresa> empresaOptional = empresaRepository.findById(id);
         if (empresaOptional.isEmpty()) throw new RegistroInexistenteException("Empresa não encontrada.");
         Empresa empresa = empresaOptional.get();
@@ -46,7 +46,7 @@ public class EmpresaService {
         return new EmpresaDTO(empresa);
     }
 
-    public String resetToken(int id, String tokenPrefix) {
+    public String resetToken(Long id, String tokenPrefix) {
         if (tokenPrefix == null) throw new DadosInvalidosException("Token prefix não informado.");
 
         Optional<Empresa> empresaOptional = empresaRepository.findById(id);

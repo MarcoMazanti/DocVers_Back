@@ -14,32 +14,32 @@ public class DocInfoController {
     private DocInfoService docInfoService;
 
     @GetMapping("/{idDoc}")
-    public ResponseEntity<DocInfo> getDocInfo(@PathVariable int idDoc, @RequestAttribute("id") int idEmpresa) {
+    public ResponseEntity<DocInfo> getDocInfo(@PathVariable Long idDoc, @RequestAttribute("id") Long idEmpresa) {
         return ResponseEntity.ok(docInfoService.getDocInfo(idEmpresa, idDoc));
     }
 
     @GetMapping("/{idDoc}/versao{versao}")
-    public ResponseEntity<FullDocDTO> getFullDocInfoVersao(@PathVariable int idDoc, @PathVariable("versao") int versao, @RequestAttribute("id") int idEmpresa) {
+    public ResponseEntity<FullDocDTO> getFullDocInfoVersao(@PathVariable Long idDoc, @PathVariable("versao") int versao, @RequestAttribute("id") Long idEmpresa) {
         return ResponseEntity.ok(docInfoService.getDocInfoByVersion(idEmpresa, idDoc, versao));
     }
 
     @GetMapping("/{idDoc}/all")
-    public ResponseEntity<FullDocDTO> getAllFullDocInfo(@PathVariable int idDoc, @RequestAttribute("id") int idEmpresa) {
+    public ResponseEntity<FullDocDTO> getAllFullDocInfo(@PathVariable Long idDoc, @RequestAttribute("id") Long idEmpresa) {
         return ResponseEntity.ok(docInfoService.getAllDocInfo(idEmpresa, idDoc));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<DocInfo> createDocInfo(@RequestParam("nome") String nome, @RequestAttribute("id") int idEmpresa) {
+    public ResponseEntity<DocInfo> createDocInfo(@RequestParam("nome") String nome, @RequestAttribute("id") Long idEmpresa) {
         return ResponseEntity.ok(docInfoService.create(nome, idEmpresa));
     }
 
     @PutMapping("/update/{idDoc}")
-    public ResponseEntity<DocInfo> updateNomeDocInfo(@PathVariable int idDoc, @RequestParam("nome") String nome, @RequestAttribute("id") int idEmpresa) {
+    public ResponseEntity<DocInfo> updateNomeDocInfo(@PathVariable Long idDoc, @RequestParam("nome") String nome, @RequestAttribute("id") Long idEmpresa) {
         return ResponseEntity.ok(docInfoService.updateNome(idEmpresa, idDoc, nome));
     }
 
     @DeleteMapping("/{idDoc}")
-    public ResponseEntity<Void> deleteDocInfo(@PathVariable int idDoc, @RequestAttribute("id") int idEmpresa) {
+    public ResponseEntity<Void> deleteDocInfo(@PathVariable Long idDoc, @RequestAttribute("id") Long idEmpresa) {
         docInfoService.delete(idEmpresa, idDoc);
         return ResponseEntity.ok().build();
     }
