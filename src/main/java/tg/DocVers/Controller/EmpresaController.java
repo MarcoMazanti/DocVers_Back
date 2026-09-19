@@ -20,14 +20,14 @@ public class EmpresaController {
     }
 
     @PostMapping("/reset/senha")
-    public ResponseEntity<EmpresaDTO> resetSenha(@RequestAttribute("id") int id,
+    public ResponseEntity<EmpresaDTO> resetSenha(@RequestAttribute("id") Long id,
                                                  @RequestHeader("token") String token,
                                                  @RequestBody ResetSenhaDTO resetSenhaDTO) {
         return ResponseEntity.ok(empresaService.resetSenha(id, token, resetSenhaDTO));
     }
 
     @PostMapping("/reset/token")
-    public ResponseEntity<String> resetToken(@RequestAttribute("id") int id,
+    public ResponseEntity<String> resetToken(@RequestAttribute("id") Long id,
                                                   @RequestParam("tokenPrefix") String tokenPrefix) {
         return ResponseEntity.ok(empresaService.resetToken(id, tokenPrefix));
     }

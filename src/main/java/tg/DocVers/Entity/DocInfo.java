@@ -1,6 +1,9 @@
 package tg.DocVers.Entity;
 
 import java.time.ZonedDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity(name = "doc_info")
 public class DocInfo {
+    @Id
     private Long id;
     private Long idEmpresa;
     private String nome;
