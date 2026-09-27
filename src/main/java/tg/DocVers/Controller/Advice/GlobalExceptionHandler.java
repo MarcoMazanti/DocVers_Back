@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tg.DocVers.DTO.External.ErrorResponse;
 import tg.DocVers.Exception.DadosInvalidosException;
+import tg.DocVers.Exception.FileException;
 import tg.DocVers.Exception.RegistroInexistenteException;
 import tg.DocVers.Exception.SolicitacaoNegadaException;
 
@@ -35,6 +36,12 @@ public class GlobalExceptionHandler {
     }
 
     // Erro 500 - Internal Server Error
+    @ExceptionHandler(FileException.class)
+    public ResponseEntity<Object> handleFileException(FileException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(), LocalDateTime.now()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneric(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -2,13 +2,20 @@ package tg.DocVers.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import tg.DocVers.DTO.FullDocDTO;
 import tg.DocVers.DTO.NewDocDTO;
 import tg.DocVers.Entity.DocInfo;
 import tg.DocVers.Entity.Documentacao;
+import tg.DocVers.Entity.TipoDocumento;
+import tg.DocVers.Exception.DadosInvalidosException;
+import tg.DocVers.Exception.FileException;
 import tg.DocVers.Exception.RegistroInexistenteException;
+import tg.DocVers.Exception.SolicitacaoNegadaException;
 import tg.DocVers.Repository.DocumentacaoRepository;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,13 +27,15 @@ public class DocumentacaoService {
     private DocumentacaoRepository documentacaoRepository;
     @Autowired
     private DocInfoService docInfoService;
+    @Autowired
+    private DockerService dockerService;
 
     // Responsável por apontar qual classe está gerando o log
     private static final Logger logger = Logger.getLogger(DocumentacaoService.class.getName());
 
-    // =================================================================
-    //  APENAS ESTÁ A SER DESENVOLVIDO PARA DOCUMENTOS COM TIPAGEM TXT
-    // =================================================================
+    // =============================================================================
+    //  APENAS ESTÁ A SER DESENVOLVIDO PARA DOCUMENTOS COM TIPAGEM REGISTRO_INTERNO
+    // =============================================================================
 
     // Obter documentação pelo id
     public Documentacao getDocumentacaoById(String id, Long idEmpresa) {
@@ -53,39 +62,89 @@ public class DocumentacaoService {
         return documentacaoList;
     }
 
+    public File getFileFromDocker(String nomeArquivo, Long idEmpresa) {
+        if (nomeArquivo.contains(idEmpresa.toString()))
+            return dockerService.getFileFromDocker(nomeArquivo);
+        else
+            return null;
+    }
+
     // criar nova documentação do zero, com o DocInfo
-    public FullDocDTO createFullDocumentacao(String nomeDocumento, NewDocDTO newDocDTO, Long idEmpresa) {
+    public FullDocDTO createFullDocumentacao(String nomeDocumento, NewDocDTO newDocDTO, Long idEmpresa, MultipartFile arquivo) {
         DocInfo docInfo = docInfoService.create(nomeDocumento, idEmpresa);
 
         Documentacao documentacao = documentacaoRepository.save(
                 new Documentacao(
                         newDocDTO.idDocInfo(),
-                        newDocDTO.nomeArquivo(),
                         newDocDTO.tipo(),
                         newDocDTO.texto()));
+
+        documentacao.setNomeArquivo(setNomeArquivo(documentacao, idEmpresa));
+
+        // Verificar se deve mandar o arquivo para o DOCKER
+        if (!newDocDTO.tipo().equals(TipoDocumento.REGISTRO_INTERNO)) {
+            try {
+                // Tratativa do arquivo para salvar
+                File arquivoDocker = new File(documentacao.getNomeArquivo());
+                arquivo.transferTo(arquivoDocker);
+
+                // Envio do arquivoDocker ao docker
+                dockerService.sendFileToDocker(arquivoDocker);
+            } catch (IOException e) {
+                throw new FileException("Erro ao tratar o arquivo para o Docker");
+            }
+        }
 
         return new FullDocDTO(docInfo, List.of(documentacao));
     }
 
     // criar nova documentação
-    public Documentacao createDocumentacao(NewDocDTO newDocDTO, Long idEmpresa) {
+    public Documentacao createDocumentacao(NewDocDTO newDocDTO, Long idEmpresa, MultipartFile arquivo) {
         // Valida se a informação da documentação pertence a respectiva empresa informada
         docInfoService.getDocInfo(newDocDTO.idDocInfo(), idEmpresa);
+
+        // Valida se a extensão informada bate com a do arquivo
+        String nomeOriginal = arquivo.getOriginalFilename();
+        String extensao = nomeOriginal != null ? nomeOriginal.substring(nomeOriginal.lastIndexOf(".")) : ""; // previne a pessoa inserir nome_arquivo.pdf.exe
+
+        if (!extensao.equals("." + newDocDTO.tipo().toString().toLowerCase())) throw new SolicitacaoNegadaException("Extensão do arquivo não corresponde ao tipo informado.");
 
         // Deve adicionar mais 1 na versão do DocInfo
         docInfoService.incrementDocInfoVersion(newDocDTO.idDocInfo(), idEmpresa);
 
-        return documentacaoRepository.save(
-                new Documentacao(
-                        newDocDTO.idDocInfo(),
-                        newDocDTO.nomeArquivo(),
-                        newDocDTO.tipo(),
-                        newDocDTO.texto()));
+        Documentacao documentacao = new Documentacao(
+                newDocDTO.idDocInfo(),
+                newDocDTO.tipo(),
+                newDocDTO.texto());
+
+        documentacao.setNomeArquivo(setNomeArquivo(documentacao, idEmpresa));
+
+        // Verificar se deve mandar o arquivo para o DOCKER
+        if (!newDocDTO.tipo().equals(TipoDocumento.REGISTRO_INTERNO)) {
+            try {
+                // Tratativa do arquivo para salvar
+                File arquivoDocker = new File(documentacao.getNomeArquivo());
+                arquivo.transferTo(arquivoDocker);
+
+                // Envio do arquivoDocker ao docker
+                dockerService.sendFileToDocker(arquivoDocker);
+            } catch (IOException e) {
+                throw new FileException("Erro ao tratar o arquivo para o Docker");
+            }
+        }
+
+        return documentacaoRepository.save(documentacao);
     }
 
     // deletar documentações do mesmo DocInfo, não todos
     public void deleteListOfDocumentacao(List<UUID> listId, Long idDocInfo, Long idEmpresa) {
         List<Documentacao> documentacaoList = documentacaoRepository.findAllByIdDocInfoAndIdEmpresaAndId(listId, idDocInfo, idEmpresa);
+
+        documentacaoList.forEach(documentacao -> {
+            if (!documentacao.getTipo().equals(TipoDocumento.REGISTRO_INTERNO)) {
+                dockerService.deleteFileFromDocker(documentacao.getNomeArquivo());
+            }
+        });
 
         documentacaoRepository.deleteAll(documentacaoList);
 
@@ -98,5 +157,15 @@ public class DocumentacaoService {
 
         // Deve Ajustar a versão máxima do DocInfo
         docInfoService.decrementDocInfoVersion(idDocInfo, idEmpresa);
+    }
+
+    private String setNomeArquivo(Documentacao documentacao, Long idEmpresa) {
+        if (documentacao.getTipo() != TipoDocumento.REGISTRO_INTERNO) {
+            DocInfo docInfo = docInfoService.getDocInfo(documentacao.getIdDocInfo(), idEmpresa);
+
+            return docInfo.getIdEmpresa().toString() + "/" + documentacao.getIdDocInfo().toString() + "/" + documentacao.getId() + "." + documentacao.getTipo().toString().toLowerCase();
+        } else {
+            return null;
+        }
     }
 }

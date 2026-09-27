@@ -9,6 +9,8 @@ import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import tg.DocVers.Repository.DocInfoRepository;
 
 @Data
 @AllArgsConstructor
@@ -34,8 +36,12 @@ public class Documentacao {
         if (dataCriacao == null) {
             this.dataCriacao = new Date();
         }
+    }
 
-        this.nomeArquivo = (tipo != TipoDocumento.TXT) ? id + "." + tipo.toString().toLowerCase() : null;
+    public Documentacao(Long idDocInfo, TipoDocumento tipo, String texto) {
+        this.idDocInfo = idDocInfo;
+        this.tipo = tipo;
+        this.texto = texto;
     }
 
     public Documentacao(Long idDocInfo, String nomeArquivo, TipoDocumento tipo, String texto) {
