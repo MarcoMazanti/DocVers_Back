@@ -26,7 +26,7 @@ public class DocInfoService {
     @Autowired
     private InstituicaoRepository instituicaoRepository;
 
-    // Obter todos os DocInfos da Empresa
+    // Obter todos os DocInfos da Instituição
 
     // Obter os dados gerais
     public DocInfo getDocInfo(Long idInstituicao, Long idDoc) {
@@ -35,14 +35,16 @@ public class DocInfoService {
         if (docInfoOptional.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma informação de documentação com o ID informado.");
         DocInfo docInfo = docInfoOptional.get();
 
-        if (!Objects.equals(docInfo.getIdInstituicao(), idInstituicao)) throw new SolicitacaoNegadaException("Não é possível obter os dados de documentação de uma empresa diferente da que foi informada.");
+        Instituicao instituicaoDoc = instituicaoRepository.findById(docInfo.getIdInstituicao()).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado nenhuma instituição com o ID informado."));
+
+        if (!Objects.equals(docInfo.getIdInstituicao(), idInstituicao) || !Objects.equals(instituicaoDoc.getIdMatriz(), idInstituicao)) throw new SolicitacaoNegadaException("Não é possível obter os dados de documentação de uma instituição diferente da que foi informada.");
 
         return docInfo;
     }
 
     // Obter os dados de uma versão específica
     public FullDocDTO getDocInfoByVersion(Long idInstituicao, Long idDoc, int versao) {
-        DocInfo docInfo =getDocInfo(idInstituicao, idDoc);
+        DocInfo docInfo = getDocInfo(idInstituicao, idDoc);
 
         Optional<Documentacao> documentacaoOptional = documentacaoRepository.findByIdDocInfoAndVersao(idDoc, versao);
         if (documentacaoOptional.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma documentação com o ID informado e versão informada.");
@@ -53,7 +55,7 @@ public class DocInfoService {
 
     // Obter os dados de todas as versões
     public FullDocDTO getAllDocInfo(Long idInstituicao, Long idDoc) {
-        DocInfo docInfo =getDocInfo(idInstituicao, idDoc);
+        DocInfo docInfo = getDocInfo(idInstituicao, idDoc);
 
         List<Documentacao> documentacoes = documentacaoRepository.findAllByIdDocInfo(idDoc);
         if (documentacoes.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma documentação com o ID informado.");
@@ -65,6 +67,7 @@ public class DocInfoService {
 
 
     // Criar centro de informações de documentação
+    // Apenas o Polo pode criar uma documentação para eles
     public DocInfo create(String nome, Long idInstituicao) {
         Instituicao instituicao = instituicaoRepository.findById(idInstituicao).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado nenhuma instituição com o ID informado."));
 
@@ -74,6 +77,7 @@ public class DocInfoService {
     }
 
     // Atualizar nome
+    // Apenas o Polo pode atualizar o nome da sua documentação
     public DocInfo updateNome(Long idInstituicao, Long idDoc, String nome) {
         DocInfo docInfo = getDocInfo(idInstituicao, idDoc);
         docInfo.setNome(nome);
@@ -83,6 +87,7 @@ public class DocInfoService {
     }
 
     // Deletar documentações
+    // Apenas o Polo pode deletar a suas documentações
     public void delete(Long idInstituicao, Long idDoc) {
         FullDocDTO fullDocDTO = getAllDocInfo(idInstituicao, idDoc);
 

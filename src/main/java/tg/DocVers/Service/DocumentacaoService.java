@@ -40,6 +40,8 @@ public class DocumentacaoService {
     // =============================================================================
     //  APENAS ESTÁ A SER DESENVOLVIDO PARA DOCUMENTOS COM TIPAGEM REGISTRO_INTERNO
     // =============================================================================
+    //      A INSTITUIÇÃO MATRIZ PODE VER TODAS AS DOCUMENTAÇÕES DOS SEUS POLOS
+    // =============================================================================
 
     // Obter documentação pelo id
     public Documentacao getDocumentacaoById(String id, Long idInstituicao) {
@@ -48,7 +50,7 @@ public class DocumentacaoService {
         if (documentacaoOptional.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado um documento com o id " + id);
         Documentacao documentacao = documentacaoOptional.get();
 
-        // Valida se a informação da documentação pertence a respectiva empresa informada
+        // Valida se a informação da documentação pertence a respetiva instituição informada
         docInfoService.getDocInfo(documentacao.getIdDocInfo(), idInstituicao);
 
         return documentacao;
@@ -56,7 +58,7 @@ public class DocumentacaoService {
 
     // obter todas as documentações por idDocInfo
     public List<Documentacao> getDocumentacoesByIdDocInfo(Long idDocInfo, Long idInstituicao) {
-        // Valida se a informação da documentação pertence a respectiva empresa informada
+        // Valida se a informação da documentação pertence a respetiva instituição informada
         docInfoService.getDocInfo(idDocInfo, idInstituicao);
 
         List<Documentacao> documentacaoList = documentacaoRepository.findAllByIdDocInfo(idDocInfo);
@@ -73,7 +75,8 @@ public class DocumentacaoService {
             return null;
     }
 
-    // criar nova documentação do zero, com o DocInfo
+    // criar documentação do zero, com o DocInfo
+    // Apenas o Polo pode criar uma documentação para eles
     public FullDocDTO createFullDocumentacao(String nomeDocumento, NewDocDTO newDocDTO, Long idInstituicao, MultipartFile arquivo) {
         DocInfo docInfo = docInfoService.create(nomeDocumento, idInstituicao);
 
@@ -102,9 +105,10 @@ public class DocumentacaoService {
         return new FullDocDTO(docInfo, List.of(documentacao));
     }
 
-    // criar nova documentação
+    // criar documentação
+    // Apenas o Polo pode criar uma documentação para eles
     public Documentacao createDocumentacao(NewDocDTO newDocDTO, Long idInstituicao, MultipartFile arquivo) {
-        // Valida se a informação da documentação pertence a respectiva empresa informada
+        // Valida se a informação da documentação pertence a respectiva instituição informada
         docInfoService.getDocInfo(newDocDTO.idDocInfo(), idInstituicao);
 
         // Valida se a extensão informada bate com a do arquivo
@@ -141,6 +145,7 @@ public class DocumentacaoService {
     }
 
     // deletar documentações do mesmo DocInfo, não todos
+    // Apenas o Polo pode deletar as suas documentações
     public void deleteListOfDocumentacao(List<UUID> listId, Long idDocInfo, Long idInstituicao) {
         List<Documentacao> documentacaoList = documentacaoRepository.findAllByIdDocInfoAndIdEmpresaAndId(listId, idDocInfo, idInstituicao);
 
