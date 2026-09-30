@@ -21,6 +21,7 @@ public class DocInfo {
     private int versaoMax;
     private ZonedDateTime criadoEm;
     private ZonedDateTime atualizadoEm;
+    private boolean publicoInstituicao = false;
 
     public DocInfo(Long idInstituicao, Long idMatriz, String nome, int versaoMax, ZonedDateTime criadoEm, ZonedDateTime atualizadoEm) {
         this.idInstituicao = idInstituicao;

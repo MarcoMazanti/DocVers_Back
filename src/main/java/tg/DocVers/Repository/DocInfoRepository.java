@@ -12,7 +12,7 @@ import java.util.List;
 public interface DocInfoRepository extends JpaRepository<DocInfo, Long> {
     @Query(value = "SELECT di.* FROM doc_info di " +
             "INNER JOIN instituicao i ON di.idInstituicao = i.id " +
-            "WHERE di.idInstituicao = :idInstituicao OR i.idMatriz = :idInstituicao", nativeQuery = true)
+            "WHERE di.idInstituicao = :idInstituicao OR i.idMatriz = :idInstituicao OR di.publicoInstituicao = true", nativeQuery = true)
     List<DocInfo> findAllByIdInstituicao(
             @Param("idInstituicao") Long idInstituicao
     );
