@@ -1,6 +1,8 @@
 package tg.DocVers.Entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,15 +13,17 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "empresa")
-public class Empresa {
+@Entity(name = "instituicao")
+public class Instituicao {
     @Id
     private Long id;
+    private Long idMatriz;
     private String nome;
     private String cnpj; // Campo único para identificar a empresa
     private String senha; // senha salva em hash
     private String token; // token gerado de forma aleatória e armazenado em hash, o token puro deve ter no mínimo 45 caracteres
     private String tokenPrefix; // prefixo determinado pela empresa
+    @Enumerated(EnumType.STRING)
     private SituacaoEmpresa situacao;
     private Date dataContrato;
     private Date dataLimiteContrato;

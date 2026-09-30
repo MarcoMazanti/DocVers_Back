@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 import tg.DocVers.DTO.FullDocDTO;
 import tg.DocVers.Entity.DocInfo;
 import tg.DocVers.Entity.Documentacao;
+import tg.DocVers.Entity.Instituicao;
 import tg.DocVers.Exception.RegistroInexistenteException;
 import tg.DocVers.Exception.SolicitacaoNegadaException;
 import tg.DocVers.Repository.DocInfoRepository;
 import tg.DocVers.Repository.DocumentacaoRepository;
+import tg.DocVers.Repository.InstituicaoRepository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -21,24 +23,26 @@ public class DocInfoService {
     private DocInfoRepository docInfoRepository;
     @Autowired
     private DocumentacaoRepository documentacaoRepository;
+    @Autowired
+    private InstituicaoRepository instituicaoRepository;
 
     // Obter todos os DocInfos da Empresa
 
     // Obter os dados gerais
-    public DocInfo getDocInfo(Long idEmpresa, Long idDoc) {
+    public DocInfo getDocInfo(Long idInstituicao, Long idDoc) {
         Optional<DocInfo> docInfoOptional = docInfoRepository.findById(idDoc);
 
         if (docInfoOptional.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma informação de documentação com o ID informado.");
         DocInfo docInfo = docInfoOptional.get();
 
-        if (!Objects.equals(docInfo.getIdEmpresa(), idEmpresa)) throw new SolicitacaoNegadaException("Não é possível obter os dados de documentação de uma empresa diferente da que foi informada.");
+        if (!Objects.equals(docInfo.getIdInstituicao(), idInstituicao)) throw new SolicitacaoNegadaException("Não é possível obter os dados de documentação de uma empresa diferente da que foi informada.");
 
         return docInfo;
     }
 
     // Obter os dados de uma versão específica
-    public FullDocDTO getDocInfoByVersion(Long idEmpresa, Long idDoc, int versao) {
-        DocInfo docInfo =getDocInfo(idEmpresa, idDoc);
+    public FullDocDTO getDocInfoByVersion(Long idInstituicao, Long idDoc, int versao) {
+        DocInfo docInfo =getDocInfo(idInstituicao, idDoc);
 
         Optional<Documentacao> documentacaoOptional = documentacaoRepository.findByIdDocInfoAndVersao(idDoc, versao);
         if (documentacaoOptional.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma documentação com o ID informado e versão informada.");
@@ -48,8 +52,8 @@ public class DocInfoService {
     }
 
     // Obter os dados de todas as versões
-    public FullDocDTO getAllDocInfo(Long idEmpresa, Long idDoc) {
-        DocInfo docInfo =getDocInfo(idEmpresa, idDoc);
+    public FullDocDTO getAllDocInfo(Long idInstituicao, Long idDoc) {
+        DocInfo docInfo =getDocInfo(idInstituicao, idDoc);
 
         List<Documentacao> documentacoes = documentacaoRepository.findAllByIdDocInfo(idDoc);
         if (documentacoes.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma documentação com o ID informado.");
@@ -61,15 +65,17 @@ public class DocInfoService {
 
 
     // Criar centro de informações de documentação
-    public DocInfo create(String nome, Long idEmpresa) {
-        DocInfo docInfo = new DocInfo(idEmpresa, nome, 0, ZonedDateTime.now(), ZonedDateTime.now());
+    public DocInfo create(String nome, Long idInstituicao) {
+        Instituicao instituicao = instituicaoRepository.findById(idInstituicao).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado nenhuma instituição com o ID informado."));
+
+        DocInfo docInfo = new DocInfo(instituicao.getId(), instituicao.getIdMatriz(), nome, 0, ZonedDateTime.now(), ZonedDateTime.now());
 
         return docInfoRepository.save(docInfo);
     }
 
     // Atualizar nome
-    public DocInfo updateNome(Long idEmpresa, Long idDoc, String nome) {
-        DocInfo docInfo = getDocInfo(idEmpresa, idDoc);
+    public DocInfo updateNome(Long idInstituicao, Long idDoc, String nome) {
+        DocInfo docInfo = getDocInfo(idInstituicao, idDoc);
         docInfo.setNome(nome);
         docInfo.setAtualizadoEm(ZonedDateTime.now());
 
@@ -77,16 +83,16 @@ public class DocInfoService {
     }
 
     // Deletar documentações
-    public void delete(Long idEmpresa, Long idDoc) {
-        FullDocDTO fullDocDTO = getAllDocInfo(idEmpresa, idDoc);
+    public void delete(Long idInstituicao, Long idDoc) {
+        FullDocDTO fullDocDTO = getAllDocInfo(idInstituicao, idDoc);
 
         documentacaoRepository.deleteAll(fullDocDTO.documentacoes());
         docInfoRepository.deleteById(fullDocDTO.docInfo().getId());
     }
 
     // Incrementar versão de documentações
-    public void incrementDocInfoVersion(Long idDocInfo, Long idEmpresa) {
-        DocInfo docInfo = getDocInfo(idEmpresa, idDocInfo);
+    public void incrementDocInfoVersion(Long idDocInfo, Long idInstituicao) {
+        DocInfo docInfo = getDocInfo(idInstituicao, idDocInfo);
         docInfo.setVersaoMax(docInfo.getVersaoMax() + 1);
         docInfo.setAtualizadoEm(ZonedDateTime.now());
 
@@ -94,13 +100,13 @@ public class DocInfoService {
     }
 
     // Diminui para a versão mais recente
-    public void decrementDocInfoVersion(Long idDocInfo, Long idEmpresa) {
-        Optional<Documentacao> documentacaoOptional = documentacaoRepository.findLastVersionByIdDocInfoAndIdEmpresa(idDocInfo, idEmpresa);
+    public void decrementDocInfoVersion(Long idDocInfo, Long idInstituicao) {
+        Optional<Documentacao> documentacaoOptional = documentacaoRepository.findLastVersionByIdDocInfoAndIdEmpresa(idDocInfo, idInstituicao);
 
         if (documentacaoOptional.isEmpty()) throw new RegistroInexistenteException("Documentação mais recente não encontrada");
         Documentacao documentacao = documentacaoOptional.get();
 
-        DocInfo docInfo = getDocInfo(idEmpresa, idDocInfo);
+        DocInfo docInfo = getDocInfo(idInstituicao, idDocInfo);
         docInfo.setVersaoMax(documentacao.getVersao());
         docInfo.setAtualizadoEm(ZonedDateTime.now());
 

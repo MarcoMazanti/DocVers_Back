@@ -26,22 +26,22 @@ public class DocumentacaoController {
     @GetMapping("/{id}")
     public ResponseEntity<Documentacao> getDocumentacaoById(
             @PathVariable String id,
-            @RequestAttribute("idEmpresa") Long idEmpresa) {
-        return ResponseEntity.ok(documentacaoService.getDocumentacaoById(id, idEmpresa));
+            @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(documentacaoService.getDocumentacaoById(id, idInstituicao));
     }
 
     @GetMapping("/list/{idDocInfo}")
     public ResponseEntity<List<Documentacao>> getDocumentacoesByIdDocInfo(
             @PathVariable Long idDocInfo,
-            @RequestAttribute("idEmpresa") Long idEmpresa) {
-        return ResponseEntity.ok(documentacaoService.getDocumentacoesByIdDocInfo(idDocInfo, idEmpresa));
+            @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(documentacaoService.getDocumentacoesByIdDocInfo(idDocInfo, idInstituicao));
     }
 
     @GetMapping("/doc/{nomeArquivo}")
     public ResponseEntity<File> getFileFromDocker(
             @PathVariable String nomeArquivo,
-            @RequestAttribute("idEmpresa") Long idEmpresa) {
-        return ResponseEntity.ok(documentacaoService.getFileFromDocker(nomeArquivo, idEmpresa));
+            @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(documentacaoService.getFileFromDocker(nomeArquivo, idInstituicao));
     }
 
     @PostMapping(path = "/create/full/{nomeDocumento}", consumes = {"multipart/form-data"})
@@ -49,23 +49,23 @@ public class DocumentacaoController {
             @PathVariable String nomeDocumento,
             @RequestPart("arquivo") MultipartFile arquivo,
             @RequestPart("dados") NewDocDTO newDocDTO,
-            @RequestAttribute("idEmpresa") Long idEmpresa) {
-        return ResponseEntity.ok(documentacaoService.createFullDocumentacao(nomeDocumento, newDocDTO, idEmpresa, arquivo));
+            @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(documentacaoService.createFullDocumentacao(nomeDocumento, newDocDTO, idInstituicao, arquivo));
     }
 
     @PostMapping(path = "/create", consumes = {"multipart/form-data"})
     public ResponseEntity<Documentacao> createDocumentacao(
             @RequestPart("arquivo") MultipartFile arquivo,
             @RequestPart("dados") NewDocDTO newDocDTO,
-            @RequestAttribute("idEmpresa") Long idEmpresa) {
-        return ResponseEntity.ok(documentacaoService.createDocumentacao(newDocDTO, idEmpresa, arquivo));
+            @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(documentacaoService.createDocumentacao(newDocDTO, idInstituicao, arquivo));
     }
 
     @DeleteMapping("/{idDocInfo}")
     public void deleteListOfDocumentacao(
             @RequestBody List<UUID> listId,
             @PathVariable Long idDocInfo,
-            @RequestAttribute("idEmpresa") Long idEmpresa) {
-        documentacaoService.deleteListOfDocumentacao(listId, idDocInfo, idEmpresa);
+            @RequestAttribute("idInstituicao") Long idInstituicao) {
+        documentacaoService.deleteListOfDocumentacao(listId, idDocInfo, idInstituicao);
     }
 }

@@ -15,14 +15,16 @@ import lombok.NoArgsConstructor;
 public class DocInfo {
     @Id
     private Long id;
-    private Long idEmpresa;
+    private Long idInstituicao;
+    private Long idMatriz;
     private String nome;
     private int versaoMax;
     private ZonedDateTime criadoEm;
     private ZonedDateTime atualizadoEm;
 
-    public DocInfo(Long idEmpresa, String nome, int versaoMax, ZonedDateTime criadoEm, ZonedDateTime atualizadoEm) {
-        this.idEmpresa = idEmpresa;
+    public DocInfo(Long idInstituicao, Long idMatriz, String nome, int versaoMax, ZonedDateTime criadoEm, ZonedDateTime atualizadoEm) {
+        this.idInstituicao = idInstituicao;
+        this.idMatriz = idMatriz;
         this.nome = nome;
         this.versaoMax = versaoMax;
         this.criadoEm = criadoEm;

@@ -3,9 +3,7 @@ package tg.DocVers.Entity;
 import java.util.Date;
 import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +20,7 @@ public class Documentacao {
     private Long idDocInfo;
     private int versao;
     private String nomeArquivo;
+    @Enumerated(EnumType.STRING)
     private TipoDocumento tipo;
     private String texto;
     private Date dataCriacao;

@@ -14,33 +14,33 @@ public class DocInfoController {
     private DocInfoService docInfoService;
 
     @GetMapping("/{idDoc}")
-    public ResponseEntity<DocInfo> getDocInfo(@PathVariable Long idDoc, @RequestAttribute("id") Long idEmpresa) {
-        return ResponseEntity.ok(docInfoService.getDocInfo(idEmpresa, idDoc));
+    public ResponseEntity<DocInfo> getDocInfo(@PathVariable Long idDoc, @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(docInfoService.getDocInfo(idInstituicao, idDoc));
     }
 
     @GetMapping("/{idDoc}/versao{versao}")
-    public ResponseEntity<FullDocDTO> getFullDocInfoVersao(@PathVariable Long idDoc, @PathVariable("versao") int versao, @RequestAttribute("id") Long idEmpresa) {
-        return ResponseEntity.ok(docInfoService.getDocInfoByVersion(idEmpresa, idDoc, versao));
+    public ResponseEntity<FullDocDTO> getFullDocInfoVersao(@PathVariable Long idDoc, @PathVariable("versao") int versao, @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(docInfoService.getDocInfoByVersion(idInstituicao, idDoc, versao));
     }
 
     @GetMapping("/{idDoc}/all")
-    public ResponseEntity<FullDocDTO> getAllFullDocInfo(@PathVariable Long idDoc, @RequestAttribute("id") Long idEmpresa) {
-        return ResponseEntity.ok(docInfoService.getAllDocInfo(idEmpresa, idDoc));
+    public ResponseEntity<FullDocDTO> getAllFullDocInfo(@PathVariable Long idDoc, @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(docInfoService.getAllDocInfo(idInstituicao, idDoc));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<DocInfo> createDocInfo(@RequestParam("nome") String nome, @RequestAttribute("id") Long idEmpresa) {
-        return ResponseEntity.ok(docInfoService.create(nome, idEmpresa));
+    public ResponseEntity<DocInfo> createDocInfo(@RequestParam("nome") String nome, @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(docInfoService.create(nome, idInstituicao));
     }
 
     @PutMapping("/update/{idDoc}")
-    public ResponseEntity<DocInfo> updateNomeDocInfo(@PathVariable Long idDoc, @RequestParam("nome") String nome, @RequestAttribute("id") Long idEmpresa) {
-        return ResponseEntity.ok(docInfoService.updateNome(idEmpresa, idDoc, nome));
+    public ResponseEntity<DocInfo> updateNomeDocInfo(@PathVariable Long idDoc, @RequestParam("nome") String nome, @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(docInfoService.updateNome(idInstituicao, idDoc, nome));
     }
 
     @DeleteMapping("/{idDoc}")
-    public ResponseEntity<Void> deleteDocInfo(@PathVariable Long idDoc, @RequestAttribute("id") Long idEmpresa) {
-        docInfoService.delete(idEmpresa, idDoc);
+    public ResponseEntity<Void> deleteDocInfo(@PathVariable Long idDoc, @RequestAttribute("idInstituicao") Long idInstituicao) {
+        docInfoService.delete(idInstituicao, idDoc);
         return ResponseEntity.ok().build();
     }
 }
