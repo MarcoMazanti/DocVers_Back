@@ -17,21 +17,21 @@ public interface DocumentacaoRepository extends JpaRepository<Documentacao, UUID
 
     @Query(value = "SELECT d.* FROM documentacao d " +
             "INNER JOIN doc_info di ON d.idDocInfo = di.id " +
-            "WHERE d.id IN (:listId) AND di.id = :idDocInfo AND di.idEmpresa = :idEmpresa",
+            "WHERE d.id IN (:listId) AND di.id = :idDocInfo AND di.idInstituicao = :idInstituicao",
             nativeQuery = true)
     List<Documentacao> findAllByIdDocInfoAndIdEmpresaAndId(
             @Param("listId") List<UUID> listId,
             @Param("idDocInfo") Long idDocInfo,
-            @Param("idEmpresa") Long idEmpresa
+            @Param("idInstituicao") Long idInstituicao
     );
 
     @Query(value = "SELECT d.* FROM documentacao d " +
             "INNER JOIN doc_info di ON d.idDocInfo = di.id " +
-            "WHERE di.id = :idDocInfo AND di.idEmpresa = :idEmpresa " +
+            "WHERE di.id = :idDocInfo AND di.idInstituicao = :idInstituicao " +
             "ORDER BY d.versao DESC LIMIT 1",
             nativeQuery = true)
     Optional<Documentacao> findLastVersionByIdDocInfoAndIdEmpresa(
             @Param("idDocInfo") Long idDocInfo,
-            @Param("idEmpresa") Long idEmpresa
+            @Param("idInstituicao") Long idInstituicao
     );
 }

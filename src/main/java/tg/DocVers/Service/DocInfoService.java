@@ -27,6 +27,9 @@ public class DocInfoService {
     private InstituicaoRepository instituicaoRepository;
 
     // Obter todos os DocInfos da Instituição
+    public List<DocInfo> getAllDocInfos(Long idInstituicao) {
+        return docInfoRepository.findAllByIdInstituicao(idInstituicao);
+    }
 
     // Obter os dados gerais
     public DocInfo getDocInfo(Long idInstituicao, Long idDoc) {

@@ -7,11 +7,18 @@ import tg.DocVers.DTO.FullDocDTO;
 import tg.DocVers.Entity.DocInfo;
 import tg.DocVers.Service.DocInfoService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/docInfo")
 public class DocInfoController {
     @Autowired
     private DocInfoService docInfoService;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<DocInfo>> getAllDocInfos(@RequestAttribute("idInstituicao") Long idInstituicao) {
+        return ResponseEntity.ok(docInfoService.getAllDocInfos(idInstituicao));
+    }
 
     @GetMapping("/{idDoc}")
     public ResponseEntity<DocInfo> getDocInfo(@PathVariable Long idDoc, @RequestAttribute("idInstituicao") Long idInstituicao) {
