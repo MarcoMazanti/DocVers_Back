@@ -39,8 +39,12 @@ public class DocInfoService {
         DocInfo docInfo = docInfoOptional.get();
 
         Instituicao instituicaoDoc = instituicaoRepository.findById(docInfo.getIdInstituicao()).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado nenhuma instituição com o ID informado."));
+        Instituicao instituicaoUser = instituicaoRepository.findById(idInstituicao).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado nenhuma instituição com o ID informado."));
 
-        if (!Objects.equals(docInfo.getIdInstituicao(), idInstituicao) || !Objects.equals(instituicaoDoc.getIdMatriz(), idInstituicao)) throw new SolicitacaoNegadaException("Não é possível obter os dados de documentação de uma instituição diferente da que foi informada.");
+
+        if (!Objects.equals(docInfo.getIdInstituicao(), idInstituicao) ||
+                !Objects.equals(instituicaoDoc.getIdMatriz(), idInstituicao) ||
+                !(docInfo.isPublicoInstituicao() && instituicaoDoc.getIdMatriz().equals(instituicaoUser.getIdMatriz()))) throw new SolicitacaoNegadaException("Não é possível obter os dados de documentação de uma instituição diferente da que foi informada.");
 
         return docInfo;
     }
