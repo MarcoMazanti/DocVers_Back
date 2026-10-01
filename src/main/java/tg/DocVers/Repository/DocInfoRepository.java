@@ -16,4 +16,6 @@ public interface DocInfoRepository extends JpaRepository<DocInfo, Long> {
     List<DocInfo> findAllByIdInstituicao(
             @Param("idInstituicao") Long idInstituicao
     );
+
+    Long id(Long id);
 }

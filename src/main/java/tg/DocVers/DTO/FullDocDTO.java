@@ -7,11 +7,11 @@ import tg.DocVers.Entity.Documentacao;
 
 import java.util.List;
 
-public record FullDocDTO(DocInfo docInfo, List<Documentacao> documentacoes) {
+public record FullDocDTO(DocInfoDTO docInfoDTO, List<Documentacao> documentacoes) {
     @JsonCreator
-    public FullDocDTO(@JsonProperty("docInfo") DocInfo docInfo,
+    public FullDocDTO(@JsonProperty("docInfoDTO") DocInfoDTO docInfoDTO,
                       @JsonProperty("documentacoes") List<Documentacao> documentacoes) {
-        this.docInfo = docInfo;
+        this.docInfoDTO = docInfoDTO;
         this.documentacoes = documentacoes;
     }
 }

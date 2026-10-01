@@ -23,6 +23,11 @@ public class TagController {
         return tagService.getAllByInstituicao(idInstituicao);
     }
 
+    @GetMapping("/byDocInfo/{idDocInfo}")
+    public List<String> getTagsByDocInfo(@PathVariable("idDocInfo") Long idDocInfo, @RequestAttribute("idInstituicao") Long idInstituicao) {
+        return tagService.getTagsOfDocInfo(idDocInfo, idInstituicao);
+    }
+
     @PostMapping()
     public Tags createTag(@RequestBody Tags tag, @RequestAttribute("idInstituicao") Long idInstituicao) {
         return tagService.create(tag, idInstituicao);

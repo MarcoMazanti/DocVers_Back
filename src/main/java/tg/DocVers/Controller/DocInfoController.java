@@ -3,6 +3,7 @@ package tg.DocVers.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tg.DocVers.DTO.DocInfoDTO;
 import tg.DocVers.DTO.FullDocDTO;
 import tg.DocVers.Entity.DocInfo;
 import tg.DocVers.Service.DocInfoService;
@@ -16,12 +17,12 @@ public class DocInfoController {
     private DocInfoService docInfoService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<DocInfo>> getAllDocInfos(@RequestAttribute("idInstituicao") Long idInstituicao) {
+    public ResponseEntity<List<DocInfoDTO>> getAllDocInfos(@RequestAttribute("idInstituicao") Long idInstituicao) {
         return ResponseEntity.ok(docInfoService.getAllDocInfos(idInstituicao));
     }
 
     @GetMapping("/{idDoc}")
-    public ResponseEntity<DocInfo> getDocInfo(@PathVariable Long idDoc, @RequestAttribute("idInstituicao") Long idInstituicao) {
+    public ResponseEntity<DocInfoDTO> getDocInfo(@PathVariable Long idDoc, @RequestAttribute("idInstituicao") Long idInstituicao) {
         return ResponseEntity.ok(docInfoService.getDocInfo(idInstituicao, idDoc));
     }
 
@@ -36,12 +37,12 @@ public class DocInfoController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<DocInfo> createDocInfo(@RequestParam("nome") String nome, @RequestAttribute("idInstituicao") Long idInstituicao) {
+    public ResponseEntity<DocInfoDTO> createDocInfo(@RequestParam("nome") String nome, @RequestAttribute("idInstituicao") Long idInstituicao) {
         return ResponseEntity.ok(docInfoService.create(nome, idInstituicao));
     }
 
     @PutMapping("/update/{idDoc}")
-    public ResponseEntity<DocInfo> updateNomeDocInfo(@PathVariable Long idDoc, @RequestParam("nome") String nome, @RequestAttribute("idInstituicao") Long idInstituicao) {
+    public ResponseEntity<DocInfoDTO> updateNomeDocInfo(@PathVariable Long idDoc, @RequestParam("nome") String nome, @RequestAttribute("idInstituicao") Long idInstituicao) {
         return ResponseEntity.ok(docInfoService.updateNome(idInstituicao, idDoc, nome));
     }
 
