@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import tg.DocVers.Entity.Instituicao;
 import tg.DocVers.Entity.SituacaoEmpresa;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-public record InstituicaoDTO(Long id, Long idMatriz, String nome, String cnpj, String tokenPrefix, SituacaoEmpresa situacao, Date dataContrato, Date dataLimiteContrato) {
+public record InstituicaoDTO(Long id, Long idMatriz, String nome, String cnpj, String tokenPrefix, SituacaoEmpresa situacao, LocalDate dataContrato, LocalDate dataLimiteContrato) {
     @JsonCreator
     public InstituicaoDTO(@JsonProperty("id") Long id,
                           @JsonProperty("idMatriz") Long idMatriz,
@@ -15,8 +15,8 @@ public record InstituicaoDTO(Long id, Long idMatriz, String nome, String cnpj, S
                           @JsonProperty("cnpj") String cnpj,
                           @JsonProperty("tokenPrefix") String tokenPrefix,
                           @JsonProperty("situacao") SituacaoEmpresa situacao,
-                          @JsonProperty("dataContrato") Date dataContrato,
-                          @JsonProperty("dataLimiteContrato") Date dataLimiteContrato) {
+                          @JsonProperty("dataContrato") LocalDate dataContrato,
+                          @JsonProperty("dataLimiteContrato") LocalDate dataLimiteContrato) {
         this.id = id;
         this.idMatriz = idMatriz;
         this.nome = nome;

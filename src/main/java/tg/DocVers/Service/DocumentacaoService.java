@@ -1,15 +1,16 @@
 package tg.DocVers.Service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tg.DocVers.DTO.DocInfoDTO;
 import tg.DocVers.DTO.FullDocDTO;
 import tg.DocVers.DTO.NewDocDTO;
 import tg.DocVers.Entity.DocInfo;
 import tg.DocVers.Entity.Documentacao;
 import tg.DocVers.Entity.Instituicao;
 import tg.DocVers.Entity.TipoDocumento;
-import tg.DocVers.Exception.DadosInvalidosException;
 import tg.DocVers.Exception.FileException;
 import tg.DocVers.Exception.RegistroInexistenteException;
 import tg.DocVers.Exception.SolicitacaoNegadaException;
@@ -33,6 +34,8 @@ public class DocumentacaoService {
     private DocInfoService docInfoService;
     @Autowired
     private DockerService dockerService;
+    @Autowired
+    private TagService tagService;
 
     // Responsável por apontar qual classe está gerando o log
     private static final Logger logger = Logger.getLogger(DocumentacaoService.class.getName());
@@ -78,11 +81,12 @@ public class DocumentacaoService {
     // criar documentação do zero, com o DocInfo
     // Apenas o Polo pode criar uma documentação para eles
     public FullDocDTO createFullDocumentacao(String nomeDocumento, NewDocDTO newDocDTO, Long idInstituicao, MultipartFile arquivo) {
-        DocInfo docInfo = docInfoService.create(nomeDocumento, idInstituicao);
+        DocInfoDTO docInfoDTO = docInfoService.create(nomeDocumento, idInstituicao);
+        DocInfo docInfo = new DocInfo(docInfoDTO);
 
         Documentacao documentacao = documentacaoRepository.save(
                 new Documentacao(
-                        newDocDTO.idDocInfo(),
+                        docInfoDTO.id(),
                         newDocDTO.tipo(),
                         newDocDTO.texto()));
 
@@ -102,11 +106,13 @@ public class DocumentacaoService {
             }
         }
 
-        return new FullDocDTO(docInfo, List.of(documentacao));
+        List<String> tags = tagService.getTagsOfDocInfo(docInfoDTO.id(), idInstituicao);
+        return new FullDocDTO(new DocInfoDTO(docInfo, tags), List.of(documentacao));
     }
 
     // criar documentação
     // Apenas o Polo pode criar uma documentação para eles
+    @Transactional
     public Documentacao createDocumentacao(NewDocDTO newDocDTO, Long idInstituicao, MultipartFile arquivo) {
         // Valida se a informação da documentação pertence a respectiva instituição informada
         docInfoService.getDocInfo(newDocDTO.idDocInfo(), idInstituicao);
@@ -170,7 +176,9 @@ public class DocumentacaoService {
 
     private String setNomeArquivo(Documentacao documentacao, Long idInstituicao) {
         if (documentacao.getTipo() != TipoDocumento.REGISTRO_INTERNO) {
-            DocInfo docInfo = docInfoService.getDocInfo(documentacao.getIdDocInfo(), idInstituicao);
+            DocInfoDTO docInfoDTO = docInfoService.getDocInfo(documentacao.getIdDocInfo(), idInstituicao);
+            DocInfo docInfo = new DocInfo(docInfoDTO);
+
             Instituicao instituicao = instituicaoRepository.findById(idInstituicao).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado nenhuma instituição com o ID informado."));
 
             return instituicao.getIdMatriz() + "/" +docInfo.getIdInstituicao().toString() + "/" + documentacao.getIdDocInfo().toString() + "/" + documentacao.getId() + "." + documentacao.getTipo().toString().toLowerCase();

@@ -3,10 +3,13 @@ package tg.DocVers.Entity;
 import java.time.ZonedDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tg.DocVers.DTO.DocInfoDTO;
 
 @Data
 @AllArgsConstructor
@@ -14,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "doc_info")
 public class DocInfo {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Long idInstituicao;
     private Long idMatriz;
@@ -30,5 +34,16 @@ public class DocInfo {
         this.versaoMax = versaoMax;
         this.criadoEm = criadoEm;
         this.atualizadoEm = atualizadoEm;
+    }
+
+    public DocInfo(DocInfoDTO docInfoDTO) {
+        this.id = docInfoDTO.id();
+        this.idInstituicao = docInfoDTO.idInstituicao();
+        this.idMatriz = docInfoDTO.idMatriz();
+        this.nome = docInfoDTO.nome();
+        this.versaoMax = docInfoDTO.versaoMax();
+        this.criadoEm = docInfoDTO.criadoEm();
+        this.atualizadoEm = docInfoDTO.atualizadoEm();
+        this.publicoInstituicao = docInfoDTO.publicoInstituicao();
     }
 }
