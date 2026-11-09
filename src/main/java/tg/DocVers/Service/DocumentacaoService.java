@@ -11,13 +11,11 @@ import tg.DocVers.Entity.DocInfo;
 import tg.DocVers.Entity.Documentacao;
 import tg.DocVers.Entity.Instituicao;
 import tg.DocVers.Entity.TipoDocumento;
-import tg.DocVers.Exception.DadosInvalidosException;
 import tg.DocVers.Exception.FileException;
 import tg.DocVers.Exception.RegistroInexistenteException;
 import tg.DocVers.Exception.SolicitacaoNegadaException;
 import tg.DocVers.Repository.DocumentacaoRepository;
 import tg.DocVers.Repository.InstituicaoRepository;
-import tg.DocVers.Repository.TagRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +35,7 @@ public class DocumentacaoService {
     @Autowired
     private DockerService dockerService;
     @Autowired
-    private TagRepository tagRepository;
+    private TagService tagService;
 
     // Responsável por apontar qual classe está gerando o log
     private static final Logger logger = Logger.getLogger(DocumentacaoService.class.getName());
@@ -108,7 +106,7 @@ public class DocumentacaoService {
             }
         }
 
-        List<String> tags = tagRepository.findTagsByIdDocInfoAndIdInstituicao(docInfoDTO.id(), idInstituicao);
+        List<String> tags = tagService.getTagsOfDocInfo(docInfoDTO.id(), idInstituicao);
         return new FullDocDTO(new DocInfoDTO(docInfo, tags), List.of(documentacao));
     }
 

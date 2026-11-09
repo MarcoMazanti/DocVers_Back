@@ -12,14 +12,12 @@ import tg.DocVers.Exception.SolicitacaoNegadaException;
 import tg.DocVers.Repository.DocInfoRepository;
 import tg.DocVers.Repository.DocumentacaoRepository;
 import tg.DocVers.Repository.InstituicaoRepository;
-import tg.DocVers.Repository.TagRepository;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DocInfoService {
@@ -30,7 +28,9 @@ public class DocInfoService {
     @Autowired
     private InstituicaoRepository instituicaoRepository;
     @Autowired
-    private TagRepository tagRepository;
+    private TagService tagService;
+    @Autowired
+    private DocumentacaoService documentacaoService;
 
     // Obter todos os DocInfos da Instituição
     public List<DocInfoDTO> getAllDocInfos(Long idInstituicao) {
@@ -38,7 +38,7 @@ public class DocInfoService {
         List<DocInfoDTO> docInfoDTO = new ArrayList<>();
 
         docInfo.forEach(doc -> {
-            List<String> tags = getTagsDoc(doc.getId(), idInstituicao);
+            List<String> tags = tagService.getTagsOfDocInfo(doc.getId(), idInstituicao);
             docInfoDTO.add(new DocInfoDTO(doc, tags));
         });
 
@@ -60,7 +60,7 @@ public class DocInfoService {
                 !Objects.equals(instituicaoDoc.getIdMatriz(), idInstituicao) ||
                 !(docInfo.isPublicoInstituicao() && instituicaoDoc.getIdMatriz().equals(instituicaoUser.getIdMatriz()))) throw new SolicitacaoNegadaException("Não é possível obter os dados de documentação de uma instituição diferente da que foi informada.");
 
-        List<String> tags = getTagsDoc(docInfo.getId(), idInstituicao);
+        List<String> tags = tagService.getTagsOfDocInfo(docInfo.getId(), idInstituicao);
 
         return new DocInfoDTO(docInfo, tags);
     }
@@ -80,7 +80,7 @@ public class DocInfoService {
     public FullDocDTO getAllDocInfo(Long idInstituicao, Long idDoc) {
         DocInfoDTO docInfoDTO = getDocInfo(idInstituicao, idDoc);
 
-        List<Documentacao> documentacoes = documentacaoRepository.findAllByIdDocInfo(idDoc);
+        List<Documentacao> documentacoes = documentacaoService.getDocumentacoesByIdDocInfo(idDoc, idInstituicao);
         if (documentacoes.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma documentação com o ID informado.");
 
         return new FullDocDTO(docInfoDTO, documentacoes);
@@ -96,7 +96,7 @@ public class DocInfoService {
 
         DocInfo docInfo = new DocInfo(instituicao.getId(), instituicao.getIdMatriz(), nome, 0, ZonedDateTime.now(), ZonedDateTime.now());
         docInfo = docInfoRepository.save(docInfo);
-        List<String> tags = getTagsDoc(docInfo.getId(), idInstituicao);
+        List<String> tags = tagService.getTagsOfDocInfo(docInfo.getId(), idInstituicao);
         return new DocInfoDTO(docInfo, tags);
     }
 
@@ -110,7 +110,7 @@ public class DocInfoService {
         docInfo.setAtualizadoEm(ZonedDateTime.now());
 
         docInfo = docInfoRepository.save(docInfo);
-        List<String> tags = getTagsDoc(docInfo.getId(), idInstituicao);
+        List<String> tags = tagService.getTagsOfDocInfo(docInfo.getId(), idInstituicao);
         return new DocInfoDTO(docInfo, tags);
     }
 
@@ -148,9 +148,5 @@ public class DocInfoService {
         docInfo.setAtualizadoEm(ZonedDateTime.now());
 
         docInfoRepository.save(docInfo);
-    }
-
-    private List<String> getTagsDoc(Long idDocInfo, Long idInstituicao) {
-        return tagRepository.findTagsByIdDocInfoAndIdInstituicao(idDocInfo, idInstituicao);
     }
 }
