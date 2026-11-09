@@ -3,6 +3,8 @@ package tg.DocVers.Entity;
 import java.time.ZonedDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +17,7 @@ import tg.DocVers.DTO.DocInfoDTO;
 @Entity(name = "doc_info")
 public class DocInfo {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Long idInstituicao;
     private Long idMatriz;

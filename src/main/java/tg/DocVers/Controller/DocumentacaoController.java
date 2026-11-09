@@ -44,9 +44,9 @@ public class DocumentacaoController {
         return ResponseEntity.ok(documentacaoService.getFileFromDocker(nomeArquivo, idInstituicao));
     }
 
-    @PostMapping(path = "/create/full/{nomeDocumento}", consumes = {"multipart/form-data"})
+    @PostMapping(path = "/create/full", consumes = {"multipart/form-data"})
     public ResponseEntity<FullDocDTO> createFullDocumentacao(
-            @PathVariable String nomeDocumento,
+            @RequestParam("nomeDocumento") String nomeDocumento,
             @RequestPart("arquivo") MultipartFile arquivo,
             @RequestPart("dados") NewDocDTO newDocDTO,
             @RequestAttribute("idInstituicao") Long idInstituicao) {

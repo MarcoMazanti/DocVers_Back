@@ -1,5 +1,6 @@
 package tg.DocVers.Service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -87,7 +88,7 @@ public class DocumentacaoService {
 
         Documentacao documentacao = documentacaoRepository.save(
                 new Documentacao(
-                        newDocDTO.idDocInfo(),
+                        docInfoDTO.id(),
                         newDocDTO.tipo(),
                         newDocDTO.texto()));
 
@@ -107,12 +108,13 @@ public class DocumentacaoService {
             }
         }
 
-        List<String> tags = tagRepository.findTagsByIdDocInfoAndIdInstituicao(newDocDTO.idDocInfo(), idInstituicao);
+        List<String> tags = tagRepository.findTagsByIdDocInfoAndIdInstituicao(docInfoDTO.id(), idInstituicao);
         return new FullDocDTO(new DocInfoDTO(docInfo, tags), List.of(documentacao));
     }
 
     // criar documentação
     // Apenas o Polo pode criar uma documentação para eles
+    @Transactional
     public Documentacao createDocumentacao(NewDocDTO newDocDTO, Long idInstituicao, MultipartFile arquivo) {
         // Valida se a informação da documentação pertence a respectiva instituição informada
         docInfoService.getDocInfo(newDocDTO.idDocInfo(), idInstituicao);
