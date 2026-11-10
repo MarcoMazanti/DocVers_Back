@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tg.DocVers.DTO.NewInstituicaoDTO;
 
 import java.time.LocalDate;
+
+import static tg.DocVers.Security.ManagementHash.encriptarHash;
 
 @Data
 @AllArgsConstructor
@@ -39,5 +42,13 @@ public class Instituicao {
         this.cnpj = cnpj;
         this.senha = senha;
         this.tokenPrefix = tokenPrefix;
+    }
+
+    public Instituicao(NewInstituicaoDTO newInstituicaoDTO, boolean encriptarSenha) {
+        this.idMatriz = newInstituicaoDTO.idMatriz();
+        this.nome = newInstituicaoDTO.nome();
+        this.cnpj = newInstituicaoDTO.cnpj();
+        this.senha = encriptarSenha ? encriptarHash(newInstituicaoDTO.senha()) : newInstituicaoDTO.senha();
+        this.tokenPrefix = newInstituicaoDTO.tokenPrefix();
     }
 }

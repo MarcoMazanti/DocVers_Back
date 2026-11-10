@@ -29,8 +29,6 @@ public class DocInfoService {
     private InstituicaoRepository instituicaoRepository;
     @Autowired
     private TagService tagService;
-    @Autowired
-    private DocumentacaoService documentacaoService;
 
     // Obter todos os DocInfos da Instituição
     public List<DocInfoDTO> getAllDocInfos(Long idInstituicao) {
@@ -80,7 +78,7 @@ public class DocInfoService {
     public FullDocDTO getAllDocInfo(Long idInstituicao, Long idDoc) {
         DocInfoDTO docInfoDTO = getDocInfo(idInstituicao, idDoc);
 
-        List<Documentacao> documentacoes = documentacaoService.getDocumentacoesByIdDocInfo(idDoc, idInstituicao);
+        List<Documentacao> documentacoes = documentacaoRepository.findAllByIdDocInfo(idDoc);
         if (documentacoes.isEmpty()) throw new RegistroInexistenteException("Não foi encontrado nenhuma documentação com o ID informado.");
 
         return new FullDocDTO(docInfoDTO, documentacoes);

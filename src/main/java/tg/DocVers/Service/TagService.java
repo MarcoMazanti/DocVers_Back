@@ -2,12 +2,12 @@ package tg.DocVers.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tg.DocVers.DTO.DocInfoDTO;
 import tg.DocVers.Entity.DocInfo;
 import tg.DocVers.Entity.Instituicao;
 import tg.DocVers.Entity.Tags;
 import tg.DocVers.Exception.RegistroInexistenteException;
 import tg.DocVers.Exception.SolicitacaoNegadaException;
+import tg.DocVers.Repository.DocInfoRepository;
 import tg.DocVers.Repository.InstituicaoRepository;
 import tg.DocVers.Repository.TagRepository;
 
@@ -20,7 +20,7 @@ public class TagService {
     @Autowired
     private InstituicaoRepository instituicaoRepository;
     @Autowired
-    private DocInfoService docInfoService;
+    private DocInfoRepository docInfoRepository;
 
     public Tags getById(int id, Long idInstituicao) {
         List<Tags> listTags = getAllByInstituicao(idInstituicao);
@@ -66,8 +66,7 @@ public class TagService {
     public List<String> getTagsOfDocInfo(Long idDocInfo, Long idInstituicao) {
         Instituicao instituicao = instituicaoRepository.findById(idInstituicao).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado a Instituição com este ID."));
 
-        DocInfoDTO docInfoDTO = docInfoService.getDocInfo(instituicao.getIdMatriz(), idDocInfo);
-        DocInfo docInfo = new DocInfo(docInfoDTO);
+        DocInfo docInfo = docInfoRepository.findById(idDocInfo).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado o DocInfo com este ID."));
 
         Instituicao instituicaoDoc = instituicaoRepository.findById(docInfo.getIdInstituicao()).orElseThrow(() -> new RegistroInexistenteException("Não foi encontrado a Instituição do DocInfo com este ID."));
 

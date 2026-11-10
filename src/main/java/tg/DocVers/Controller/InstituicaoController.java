@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tg.DocVers.DTO.InstituicaoDTO;
 import tg.DocVers.DTO.LoginDTO;
+import tg.DocVers.DTO.NewInstituicaoDTO;
 import tg.DocVers.DTO.ResetSenhaDTO;
 import tg.DocVers.Service.InstituicaoService;
 
@@ -15,8 +16,15 @@ public class InstituicaoController {
     private InstituicaoService instituicaoService;
 
     @GetMapping("/polo/{idAlvo}")
-    public ResponseEntity<InstituicaoDTO> getPoloInstituicao(@PathVariable Long idAlvo, @RequestAttribute("idInstituicao") Long idInstituicao) {
+    public ResponseEntity<InstituicaoDTO> getPoloInstituicao(@PathVariable Long idAlvo,
+                                                             @RequestAttribute("idInstituicao") Long idInstituicao) {
         return ResponseEntity.ok(instituicaoService.getPoloInstituicao(idAlvo, idInstituicao));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<InstituicaoDTO> createInstituicao(@RequestBody NewInstituicaoDTO newInstituicaoDTO,
+                                                               @RequestAttribute("idInstituicao") int idInstituicao) {
+        return ResponseEntity.ok(instituicaoService.create(newInstituicaoDTO, (long) idInstituicao));
     }
 
     @PostMapping("/login")

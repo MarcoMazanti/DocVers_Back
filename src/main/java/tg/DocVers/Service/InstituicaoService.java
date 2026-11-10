@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tg.DocVers.DTO.InstituicaoDTO;
 import tg.DocVers.DTO.LoginDTO;
+import tg.DocVers.DTO.NewInstituicaoDTO;
 import tg.DocVers.DTO.ResetSenhaDTO;
 import tg.DocVers.Entity.Instituicao;
 import tg.DocVers.Exception.DadosInvalidosException;
@@ -11,6 +12,7 @@ import tg.DocVers.Exception.RegistroInexistenteException;
 import tg.DocVers.Exception.SolicitacaoNegadaException;
 import tg.DocVers.Repository.InstituicaoRepository;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static tg.DocVers.Security.ManagementHash.encriptarHash;
@@ -30,6 +32,16 @@ public class InstituicaoService {
         if (!instituicao.getIdMatriz().equals(idInstituicao)) throw new SolicitacaoNegadaException("Apenas a Instituição Matriz pode verificar os dados de seus Polos.");
 
         return new InstituicaoDTO(instituicaoOpcional.get());
+    }
+
+    public InstituicaoDTO create(NewInstituicaoDTO newInstituicaoDTO, Long idInstituicao) {
+        if (newInstituicaoDTO == null || !newInstituicaoDTO.exist()) throw new DadosInvalidosException("Insira dados devidamente.");
+        if (!Objects.equals(newInstituicaoDTO.idMatriz(), idInstituicao)) throw new SolicitacaoNegadaException("Apenas pode criar polos da Instituição Matriz.");
+
+        Instituicao instituicao = new Instituicao(newInstituicaoDTO, true);
+        instituicaoRepository.save(instituicao);
+
+        return new InstituicaoDTO(instituicao);
     }
 
     public InstituicaoDTO login(LoginDTO loginDTO) {
